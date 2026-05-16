@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections;
 public class Sandbug : MonoBehaviour
 {
     [Header("Detección")]
@@ -28,14 +28,18 @@ public class Sandbug : MonoBehaviour
     private bool jugadorEncima = false;
 
     void Start()
-    {
-        animator = GetComponent<Animator>();
-        col = GetComponent<Collider2D>();
-        posicionOriginal = transform.position;
+{
+    animator = GetComponent<Animator>();
+    col = GetComponent<Collider2D>();
+    posicionOriginal = transform.position;
 
-        // Empieza escondido
-        SetSprite(false);
+    if (jugador == null)
+    {
+        jugador = GameObject.FindGameObjectWithTag("Player").transform;
     }
+
+    SetSprite(false);
+}
 
     void Update()
     {
@@ -101,19 +105,20 @@ public class Sandbug : MonoBehaviour
         Rigidbody2D rbJugador = collision.GetComponent<Rigidbody2D>();
 
         // ¿El jugador cayó desde arriba?
-        bool saltóEncima = rbJugador != null && rbJugador.linearVelocity.y < -0.1f
-                           && collision.transform.position.y > transform.position.y + 0.2f;
+       bool saltóEncima = rbJugador != null && rbJugador.linearVelocity.y < 0f
+                   && collision.transform.position.y > transform.position.y;
 
-        if (saltóEncima)
-        {
-            // Sandbug muere
-            if (animator != null) animator.SetTrigger("Morir");
-            col.enabled = false;
-            Destroy(gameObject, 0.5f);
+      if (saltóEncima)
+{
+    if (animator != null) animator.SetTrigger("Morir");
+    col.enabled = false;
 
-            // Pequeño rebote al jugador
-            rbJugador.linearVelocity = new Vector2(rbJugador.linearVelocity.x, 6f);
-        }
+    // Rebote al jugador
+    rbJugador.linearVelocity = new Vector2(rbJugador.linearVelocity.x, 6f);
+
+    // Reinicia el sandbug después de un tiempo
+    StartCoroutine(ReiniciarSandbug());
+}
         else
         {
             // Knockback al jugador
@@ -147,4 +152,16 @@ public class Sandbug : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, rangoDeteccion);
     }
+    IEnumerator ReiniciarSandbug()
+{
+    yield return new WaitForSeconds(2f);
+
+    // Resetea el estado
+    estadoActual = Estado.Escondido;
+    col.enabled = false;
+    SetSprite(false);
+    transform.position = posicionOriginal;
+
+    if (animator != null) animator.SetTrigger("Hundirse");
+}
 }

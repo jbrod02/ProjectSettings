@@ -31,6 +31,7 @@ public class Player : MonoBehaviour
     public string nombreEscenaMenuPrincipal = "MainMenu";
 
     private bool juegoTerminado = false;
+    public static Vector3 checkpointPos = Vector3.zero;
 
     void Start()
     {
@@ -99,11 +100,19 @@ public class Player : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
-        if (collision.CompareTag("Spikes"))
-        {
-            Time.timeScale = 1f;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
+       if (collision.CompareTag("Spikes"))
+{
+    Time.timeScale = 1f;
+    if (checkpointPos != Vector3.zero)
+    {
+        transform.position = checkpointPos;
+        rb2D.linearVelocity = Vector2.zero;
+    }
+    else
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+}
 
         if (collision.CompareTag("Barrel"))
         {
