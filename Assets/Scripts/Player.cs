@@ -155,4 +155,5 @@ public class Player : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene(nombreEscenaMenuPrincipal);
     }
+
 }
