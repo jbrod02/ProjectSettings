@@ -37,6 +37,8 @@ public class Player : MonoBehaviour
     {
         rb2D = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        // Resetea el checkpoint al iniciar
+    checkpointPos = Vector3.zero;
 
         Time.timeScale = 1f;
 
@@ -75,6 +77,18 @@ public class Player : MonoBehaviour
             animator.SetFloat("VerticalVelocity", rb2D.linearVelocity.y);
             animator.SetBool("IsGrounded", isGrounded);
         }
+
+        if (transform.position.y < -15f)
+{
+    if (VidaManager.instancia != null)
+    {
+        VidaManager.instancia.PerderVida();
+    }
+    else
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+}
     }
 
     void FixedUpdate()
@@ -103,10 +117,9 @@ public class Player : MonoBehaviour
        if (collision.CompareTag("Spikes"))
 {
     Time.timeScale = 1f;
-    if (checkpointPos != Vector3.zero)
+    if (VidaManager.instancia != null)
     {
-        transform.position = checkpointPos;
-        rb2D.linearVelocity = Vector2.zero;
+        VidaManager.instancia.PerderVida();
     }
     else
     {
