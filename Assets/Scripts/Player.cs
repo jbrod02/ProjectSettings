@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class Player : MonoBehaviour
 
     [Header("Panel de victoria")]
     public GameObject panelGanaste;
+    public Animator animadorGanaste;
 
     [Header("Escenas")]
     public string nombreEscenaMenuPrincipal = "MainMenu";
@@ -37,9 +39,8 @@ public class Player : MonoBehaviour
     {
         rb2D = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        // Resetea el checkpoint al iniciar
-    checkpointPos = Vector3.zero;
 
+        checkpointPos = Vector3.zero;
         Time.timeScale = 1f;
 
         if (panelGanaste != null)
@@ -79,16 +80,16 @@ public class Player : MonoBehaviour
         }
 
         if (transform.position.y < -15f)
-{
-    if (VidaManager.instancia != null)
-    {
-        VidaManager.instancia.PerderVida();
-    }
-    else
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-}
+        {
+            if (VidaManager.instancia != null)
+            {
+                VidaManager.instancia.PerderVida();
+            }
+            else
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
+        }
     }
 
     void FixedUpdate()
@@ -107,26 +108,28 @@ public class Player : MonoBehaviour
         if (collision.CompareTag("Coin"))
         {
             coins++;
+
             if (text != null)
             {
                 text.text = coins.ToString();
             }
+
             Destroy(collision.gameObject);
         }
 
-       if (collision.CompareTag("Spikes"))
-{
-    Time.timeScale = 1f;
-    if (VidaManager.instancia != null)
-    {
-        VidaManager.instancia.PerderVida();
-    }
-    else
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-}
+        if (collision.CompareTag("Spikes"))
+        {
+            Time.timeScale = 1f;
 
+            if (VidaManager.instancia != null)
+            {
+                VidaManager.instancia.PerderVida();
+            }
+            else
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
+        }
         if (collision.CompareTag("Barrel"))
         {
             Vector2 knockbackDirection = (rb2D.position - (Vector2)collision.transform.position).normalized;
@@ -134,7 +137,6 @@ public class Player : MonoBehaviour
             rb2D.AddForce(knockbackDirection * 3f, ForceMode2D.Impulse);
 
             BoxCollider2D[] colliders = collision.gameObject.GetComponents<BoxCollider2D>();
-
             foreach (BoxCollider2D collider in colliders)
             {
                 collider.enabled = false;
@@ -143,11 +145,17 @@ public class Player : MonoBehaviour
             Animator barrelAnimator = collision.GetComponent<Animator>();
             if (barrelAnimator != null)
             {
-                barrelAnimator.enabled = true;
+                    barrelAnimator.enabled = true;
+            }
+
+            BarrilRespawn barrilRespawn = collision.GetComponent<BarrilRespawn>();
+            if (barrilRespawn != null)
+            {
+                barrilRespawn.MarcarDestruido();
             }
 
             Destroy(collision.gameObject, 0.5f);
-        }
+            }
 
         if (collision.CompareTag("Ruby"))
         {
@@ -159,11 +167,22 @@ public class Player : MonoBehaviour
                 panelGanaste.SetActive(true);
             }
 
-            Destroy(collision.gameObject);
+            if (animadorGanaste != null)
+            {
+                animadorGanaste.ResetTrigger("Ganar");
+                animadorGanaste.SetTrigger("Ganar");
+            }
 
+            Destroy(collision.gameObject);
             Canvas.ForceUpdateCanvases();
             Time.timeScale = 0f;
         }
+    }
+
+    IEnumerator DesactivarBarril(GameObject barril, float tiempo)
+    {
+        yield return new WaitForSeconds(tiempo);
+        barril.SetActive(false);
     }
 
     public void ReiniciarNivel()
@@ -178,4 +197,12 @@ public class Player : MonoBehaviour
         SceneManager.LoadScene(nombreEscenaMenuPrincipal);
     }
 
+    void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
+        }
+    }
 }

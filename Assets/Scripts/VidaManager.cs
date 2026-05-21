@@ -5,11 +5,14 @@ using UnityEngine.SceneManagement;
 public class VidaManager : MonoBehaviour
 {
     public static VidaManager instancia;
-    public static int vidasGuardadas = 3; // Persiste entre reinicios
+    public static int vidasGuardadas = 3;
 
     [Header("Vidas")]
     public int vidasActuales = 3;
     public Image[] iconosVida;
+
+    [Header("Barriles que reaparecen")]
+    public BarrilRespawn[] barriles;
 
     void Awake()
     {
@@ -18,7 +21,6 @@ public class VidaManager : MonoBehaviour
             instancia = this;
         }
 
-        // Restaura las vidas guardadas
         vidasActuales = vidasGuardadas;
         ActualizarIconos();
     }
@@ -37,31 +39,61 @@ public class VidaManager : MonoBehaviour
         vidasGuardadas = vidasActuales;
         ActualizarIconos();
 
-        if (vidasActuales <= 0)
+        if (vidasActuales > 0)
         {
-            // Sin vidas → resetea todo
-            vidasGuardadas = 3;
-            Player.checkpointPos = Vector3.zero;
-            Time.timeScale = 1f;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            RespawnEnCheckpoint();
+            ReactivarBarriles();
         }
         else
         {
-            // Tiene vidas → vuelve al checkpoint
-            Player player = FindObjectOfType<Player>();
-            if (player != null)
+            ReinicioCompletoNivel();
+        }
+    }
+
+    void RespawnEnCheckpoint()
+    {
+        Player player = FindFirstObjectByType<Player>();
+
+        if (player != null)
+        {
+            Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+
+            if (Player.checkpointPos != Vector3.zero)
             {
-                if (Player.checkpointPos != Vector3.zero)
+                player.transform.position = Player.checkpointPos;
+
+                if (rb != null)
                 {
-                    player.transform.position = Player.checkpointPos;
-                    player.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
-                }
-                else
-                {
-                    Time.timeScale = 1f;
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                    rb.linearVelocity = Vector2.zero;
+                    rb.angularVelocity = 0f;
                 }
             }
+            else
+            {
+                Time.timeScale = 1f;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
         }
+    }
+
+    void ReactivarBarriles()
+    {
+        if (barriles == null || barriles.Length == 0) return;
+
+        foreach (BarrilRespawn barril in barriles)
+        {
+            if (barril != null)
+            {
+                barril.ReiniciarBarril();
+            }
+        }
+    }
+
+    void ReinicioCompletoNivel()
+    {
+        vidasGuardadas = 3;
+        Player.checkpointPos = Vector3.zero;
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 790309167574011119}
   - component: {fileID: 7373837870226523651}
   - component: {fileID: 3538825969541665024}
+  - component: {fileID: -6939309536461527722}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Barrel
@@ -208,3 +209,15 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.21, y: 0.047499627}
   m_EdgeRadius: 0
+--- !u!114 &-6939309536461527722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6601374793877854573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e53bc763f86e4b4184c62a33e4dd416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BarrilRespawn

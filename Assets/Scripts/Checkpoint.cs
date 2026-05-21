@@ -26,4 +26,5 @@ public class Checkpoint : MonoBehaviour
         // Desactiva la moneda
         gameObject.SetActive(false);
     }
+    
 }
