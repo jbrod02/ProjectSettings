@@ -37,6 +37,7 @@ public class MenuController : MonoBehaviour
     // Carga la escena del primer nivel
     public void CargarNivel1()
     {
+        VidaManager.vidasGuardadas = 3;
         SceneManager.LoadScene("SampleScene");
     }
 
@@ -44,6 +45,7 @@ public class MenuController : MonoBehaviour
     // Carga la escena del segundo nivel
     public void CargarNivel2()
     {
+        VidaManager.vidasGuardadas = 3;
         SceneManager.LoadScene("Nivel2");
     }
 

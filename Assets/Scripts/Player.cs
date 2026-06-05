@@ -25,6 +25,17 @@ public class Player : MonoBehaviour
     private int coins = 0;
     public TMP_Text text;
 
+    public AudioSource audioSource;
+    
+    public AudioClip coinClip;
+
+    public AudioClip barrelClip;
+
+
+    public AudioClip rubyClip;
+
+    public AudioClip spikesClip;
+
     [Header("Panel de victoria")]
     public GameObject panelGanaste;
     public Animator animadorGanaste;
@@ -102,11 +113,13 @@ public class Player : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
+        
         if (juegoTerminado)
             return;
 
         if (collision.CompareTag("Coin"))
         {
+            audioSource.PlayOneShot(coinClip);
             coins++;
 
             if (text != null)
@@ -119,6 +132,7 @@ public class Player : MonoBehaviour
 
         if (collision.CompareTag("Spikes"))
         {
+            audioSource.PlayOneShot(spikesClip);
             Time.timeScale = 1f;
 
             if (VidaManager.instancia != null)
@@ -132,6 +146,7 @@ public class Player : MonoBehaviour
         }
         if (collision.CompareTag("Barrel"))
         {
+            audioSource.PlayOneShot(barrelClip);
             Vector2 knockbackDirection = (rb2D.position - (Vector2)collision.transform.position).normalized;
             rb2D.linearVelocity = Vector2.zero;
             rb2D.AddForce(knockbackDirection * 3f, ForceMode2D.Impulse);
@@ -145,20 +160,25 @@ public class Player : MonoBehaviour
             Animator barrelAnimator = collision.GetComponent<Animator>();
             if (barrelAnimator != null)
             {
-                    barrelAnimator.enabled = true;
+                barrelAnimator.enabled = true;
             }
 
-            BarrilRespawn barrilRespawn = collision.GetComponent<BarrilRespawn>();
-            if (barrilRespawn != null)
+            BarrilInstancia instancia = collision.GetComponent<BarrilInstancia>();
+            if (instancia != null && instancia.spawner != null)
             {
-                barrilRespawn.MarcarDestruido();
+                Debug.Log("Player marcó destruido en " + instancia.spawner.gameObject.name);
+                instancia.spawner.MarcarDestruido();
+            }
+            else
+            {
+                Debug.LogError("El barril no tiene BarrilInstancia o spawner");
             }
 
             Destroy(collision.gameObject, 0.5f);
-            }
-
+        }
         if (collision.CompareTag("Ruby"))
         {
+            audioSource.PlayOneShot(rubyClip);
             juegoTerminado = true;
             rb2D.linearVelocity = Vector2.zero;
 
@@ -187,12 +207,16 @@ public class Player : MonoBehaviour
 
     public void ReiniciarNivel()
     {
+        VidaManager.vidasGuardadas = 3;
+        Player.checkpointPos = Vector3.zero;
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void IrAlMenuPrincipal()
     {
+        VidaManager.vidasGuardadas = 3;
+        Player.checkpointPos = Vector3.zero;
         Time.timeScale = 1f;
         SceneManager.LoadScene(nombreEscenaMenuPrincipal);
     }
@@ -205,4 +229,10 @@ public class Player : MonoBehaviour
             Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
         }
     }
+    public void IrAlSiguienteNivel()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Nivel2");
+    }
 }
+

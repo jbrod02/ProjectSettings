@@ -6,31 +6,50 @@ public class BarrilRespawn : MonoBehaviour
 
     private Vector3 posicionInicial;
     private Quaternion rotacionInicial;
-    private GameObject instanciaActual;
+    private bool destruido = false;
 
     void Start()
     {
         posicionInicial = transform.position;
         rotacionInicial = transform.rotation;
-        instanciaActual = gameObject;
+        SpawnBarril();
+    }
+
+    void SpawnBarril()
+    {
+        if (prefabBarril == null)
+        {
+            Debug.LogError("PrefabBarril no asignado en " + gameObject.name);
+            return;
+        }
+
+        GameObject nuevoBarril = Instantiate(prefabBarril, posicionInicial, rotacionInicial);
+
+        BarrilInstancia instancia = nuevoBarril.GetComponent<BarrilInstancia>();
+        if (instancia != null)
+        {
+            instancia.spawner = this;
+        }
+        else
+        {
+            Debug.LogError("El prefab del barril no tiene BarrilInstancia");
+        }
     }
 
     public void MarcarDestruido()
     {
-        instanciaActual = null;
+        destruido = true;
+        Debug.Log(gameObject.name + " marcado como destruido");
     }
 
     public void ReiniciarBarril()
     {
-        if (instanciaActual == null)
-        {
-            instanciaActual = Instantiate(prefabBarril, posicionInicial, rotacionInicial);
-            BarrilRespawn nuevo = instanciaActual.GetComponent<BarrilRespawn>();
+        Debug.Log(gameObject.name + " ReiniciarBarril, destruido = " + destruido);
 
-            if (nuevo != null)
-            {
-                nuevo.prefabBarril = prefabBarril;
-            }
+        if (destruido)
+        {
+            destruido = false;
+            SpawnBarril();
         }
     }
 }

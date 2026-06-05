@@ -2,17 +2,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+
 public class VidaManager : MonoBehaviour
 {
     public static VidaManager instancia;
     public static int vidasGuardadas = 3;
 
+
     [Header("Vidas")]
     public int vidasActuales = 3;
     public Image[] iconosVida;
 
+
     [Header("Barriles que reaparecen")]
     public BarrilRespawn[] barriles;
+
 
     void Awake()
     {
@@ -21,9 +25,11 @@ public class VidaManager : MonoBehaviour
             instancia = this;
         }
 
+
         vidasActuales = vidasGuardadas;
         ActualizarIconos();
     }
+
 
     void ActualizarIconos()
     {
@@ -33,11 +39,13 @@ public class VidaManager : MonoBehaviour
         }
     }
 
+
     public void PerderVida()
     {
         vidasActuales--;
         vidasGuardadas = vidasActuales;
         ActualizarIconos();
+
 
         if (vidasActuales > 0)
         {
@@ -50,17 +58,21 @@ public class VidaManager : MonoBehaviour
         }
     }
 
+
     void RespawnEnCheckpoint()
     {
         Player player = FindFirstObjectByType<Player>();
+
 
         if (player != null)
         {
             Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
 
+
             if (Player.checkpointPos != Vector3.zero)
             {
                 player.transform.position = Player.checkpointPos;
+
 
                 if (rb != null)
                 {
@@ -76,9 +88,11 @@ public class VidaManager : MonoBehaviour
         }
     }
 
+
     void ReactivarBarriles()
     {
         if (barriles == null || barriles.Length == 0) return;
+
 
         foreach (BarrilRespawn barril in barriles)
         {
@@ -88,6 +102,7 @@ public class VidaManager : MonoBehaviour
             }
         }
     }
+
 
     void ReinicioCompletoNivel()
     {
